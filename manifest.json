@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Remote Switch for Pi-Hole",
-    "version": "1.0",
+    "version": "2.0",
     "author": "Spencer Yoder",
 
     "description": "Lets you Enable/Disable a Pi-Hole with out opening a new tab.",

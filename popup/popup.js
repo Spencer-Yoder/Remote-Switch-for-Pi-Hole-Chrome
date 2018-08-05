@@ -1,17 +1,32 @@
 var API_KEY = null; //Temporary variable for the API-Key 
+var MAX_TIME = null;
 
 //Function called after the enable/disable button is pressed.
 function buttonClicked() {
     var httpResponse = new XMLHttpRequest();    //Make a new object to accept return from server
     var url = null;
 
-    if (document.getElementById("button1").value == "Disable") {  //If the Pi-Hole is currently ENABLED
+    if (document.getElementById("sliderBox").checked) {
         var time = document.getElementById("time").value;   //get the time from the box
-        time = time * 60;   //get it in minutes
+        console.log(MAX_TIME + "!!!");
+
+        if(Number(time) <= Number(MAX_TIME)){
+            console.log(time + " " + MAX_TIME);
+            time = time * 60;
+            console.log("a"+ time);
+        }
+        else{
+            time = MAX_TIME * 60;
+            console.log("b");
+        }
+
+        console.log(time + "***");
+
+        //time = time * 60;   //get it in minutes
         url = "http://pi.hole/admin/api.php?disable=" + String(time) + "&auth=" + API_KEY;  //build the url
     }
 
-    else if (document.getElementById("button1").value == "Enable") {  //If the Pi-Hole is currently DISABLED
+    else if (!document.getElementById("sliderBox").checked) {
         url = "http://pi.hole/admin/api.php?enable&auth=" + API_KEY;    //build the url
     }
 
@@ -48,7 +63,7 @@ function changeIcon(data) {
     if (data.status == "disabled") {  //If the Pi-Hole status is disabled
         document.getElementById("display_status").innerHTML = "Disabled";   //Set the popup text
         document.getElementById("display_status").className = "disabled";   //changed the text color
-        document.getElementById("button1").value = "Enable";    //change the button for enable
+        document.getElementById("sliderBox").checked = false;
         document.getElementById("time").disabled = true;    //disable the time input box
         chrome.browserAction.setBadgeText({ text: "Off" });  //set the badge to off
     }
@@ -56,15 +71,14 @@ function changeIcon(data) {
     else if (data.status == 'enabled') {    //If the Pi-Hole is enabled
         document.getElementById("display_status").innerHTML = "Enabled";    //Set the popup text
         document.getElementById("display_status").className = "enabled";    //set the text color
-        document.getElementById("button1").value = "Disable";   //change the button text
         document.getElementById("time").disabled = false;   //turn on the input box
+        document.getElementById("sliderBox").checked = true;
         chrome.browserAction.setBadgeText({ text: "On" });   //set badge text to on
     }
 
     else {   //If there is an API key error
         document.getElementById("display_status").innerHTML = "API Error";    //Set the popup text
         document.getElementById("display_status").className = "disabled";    //set the text color
-        document.getElementById("button1").value = "";   //change the button text
         document.getElementById("time").disabled = true;   //turn off the input box
         chrome.browserAction.setBadgeText({ text: "" });   //set badge text to empty
     }
@@ -75,6 +89,12 @@ function getStorage() {
     chrome.storage.local.get('api_key', function (data) {
         API_KEY = data.api_key;
     });
+
+    chrome.storage.local.get('max_time', function (data) {
+        MAX_TIME = data.max_time;
+        console.log(MAX_TIME);
+    });
 }
-document.getElementById("button1").addEventListener("click", buttonClicked);    //Action listener for button clicked
+
 document.addEventListener("DOMContentLoaded", getPiHoleStatus); //When the page loads get the status
+document.addEventListener('mouseup', buttonClicked);    //When the switch is clicked

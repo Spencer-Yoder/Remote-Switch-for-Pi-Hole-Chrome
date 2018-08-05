@@ -1,3 +1,4 @@
+init();
 checkStatus();  //Get the current status when the browser opens
 window.setInterval(checkStatus, 30000); //Keep checking every 30 seconds
 
@@ -24,4 +25,17 @@ function checkStatus() {
     };
     httpResponse.open("GET", "http://pi.hole/admin/api.php?", true);
     httpResponse.send();
+}
+
+
+function init()
+{
+    chrome.storage.local.getBytesInUse(['max_time'], function(bytes){
+        if(bytes == 0)
+        {
+            chrome.storage.local.set({max_time: 0}, function () {
+                console.log("Set Max time");
+            });
+        }
+    });
 }

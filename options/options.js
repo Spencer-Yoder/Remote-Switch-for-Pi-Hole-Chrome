@@ -1,16 +1,15 @@
 //Function that saves the key to storage
 function setStorage() {
-    chrome.storage.local.set({api_key: document.getElementById("api_key").value}, function () {
+    chrome.storage.local.set({api_key: document.getElementById("api_key").value, max_time: document.getElementById("max_time").value}, function () {
         document.getElementById("confirmation_status").innerHTML = "Saved Successful!";
-        console.log(document.getElementById("api_key").value + " From Form");
     });
 }
 
 //Function that get the API key from the storage
 function getStorage() {
-    chrome.storage.local.get('api_key', function (data) {
+    chrome.storage.local.get(null, function (data) {
         document.getElementById("api_key").defaultValue = data.api_key;
-        console.log(data.api_key);
+        document.getElementById("max_time").defaultValue = data.max_time;
     });
 }
 
