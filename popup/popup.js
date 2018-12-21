@@ -1,8 +1,10 @@
 var API_KEY = null; //Temporary variable for the API-Key 
 var MAX_TIME = null;
+var PI_URI_BASE = null;
 
 //Function called after the enable/disable button is pressed.
 function buttonClicked() {
+	getStorage();   //get the API key from local storage
     var httpResponse = new XMLHttpRequest();    //Make a new object to accept return from server
     var url = null;
 
@@ -23,11 +25,11 @@ function buttonClicked() {
         console.log(time + "***");
 
         //time = time * 60;   //get it in minutes
-        url = "http://pi.hole/admin/api.php?disable=" + String(time) + "&auth=" + API_KEY;  //build the url
+        url = PI_URI_BASE+"/admin/api.php?disable=" + String(time) + "&auth=" + API_KEY;  //build the url
     }
 
     else if (!document.getElementById("sliderBox").checked) {
-        url = "http://pi.hole/admin/api.php?enable&auth=" + API_KEY;    //build the url
+        url = PI_URI_BASE+"/admin/api.php?enable&auth=" + API_KEY;    //build the url
     }
 
     httpResponse.onreadystatechange = function () {
@@ -54,7 +56,7 @@ function getPiHoleStatus() {
             changeIcon(data);
         }
     };
-    httpResponse.open("GET", "http://pi.hole/admin/api.php?", true);
+    httpResponse.open("GET", PI_URI_BASE+"/admin/api.php?", true);
     httpResponse.send();
 }
 
@@ -86,6 +88,10 @@ function changeIcon(data) {
 
 //Function thats the API key from local storage
 function getStorage() {
+	chrome.storage.local.get('pi_uri_base', function (data) {
+        PI_URI_BASE = data.pi_uri_base;
+    });
+	
     chrome.storage.local.get('api_key', function (data) {
         API_KEY = data.api_key;
     });
