@@ -6,7 +6,7 @@ function buttonClicked() {
     var httpResponse = new XMLHttpRequest();    //Make a new object to accept return from server
     var url = null;
 
-    if (document.getElementById("sliderBox").checked) {
+    if (!document.getElementById("sliderBox").checked) {
         var time = document.getElementById("time").value;   //get the time from the box
         console.log(MAX_TIME + "!!!");
 
@@ -26,7 +26,7 @@ function buttonClicked() {
         url = "http://pi.hole/admin/api.php?disable=" + String(time) + "&auth=" + API_KEY;  //build the url
     }
 
-    else if (!document.getElementById("sliderBox").checked) {
+    else if (document.getElementById("sliderBox").checked) {
         url = "http://pi.hole/admin/api.php?enable&auth=" + API_KEY;    //build the url
     }
 
@@ -59,7 +59,6 @@ function getPiHoleStatus() {
 }
 
 function changeIcon(data) {
-
     if (data.status == "disabled") {  //If the Pi-Hole status is disabled
         document.getElementById("display_status").innerHTML = "Disabled";   //Set the popup text
         document.getElementById("display_status").className = "disabled";   //changed the text color
@@ -96,5 +95,33 @@ function getStorage() {
     });
 }
 
+function whitelist() {
+    var httpResponse = new XMLHttpRequest();    //Make a new object to accept return from server
+    var url = null;
+    var list = "white";
+    var domain = document.getElementById("domain").value;   //get the domain from the box
+    if(domain === "") return;
+    if(document.getElementById("wild").checked) list = "white_wild";
+    console.log(domain + "***");
+
+    //domain = domain * 60;   //get it in minutes
+    url = "http://pi.hole/admin/api.php?list=" + list + "&add="+ encodeURI(domain) + "&auth=" + API_KEY;  //build the url
+    httpResponse.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            if(this.response.startsWith("Success")){
+                document.getElementById("domain").value = "";
+            }
+        }
+    };
+    httpResponse.open("GET", String(url), true);
+    httpResponse.send();
+}
+
+
 document.addEventListener("DOMContentLoaded", getPiHoleStatus); //When the page loads get the status
-document.addEventListener('mouseup', buttonClicked);    //When the switch is clicked
+document.getElementById("sliderBox").addEventListener('change', buttonClicked);    //When the switch is clicked
+document.getElementById("whitelist").addEventListener('click', whitelist);    //When the switch is clicked
+chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
+    let url = tabs[0].url;
+    document.getElementById("domain").value = (new URL(url)).hostname;
+});
