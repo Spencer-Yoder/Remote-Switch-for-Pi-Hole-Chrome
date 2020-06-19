@@ -110,9 +110,6 @@ function whitelist() {
         if (this.readyState == 4 && this.status == 200) {
             if(this.response.startsWith("Success")){
                 chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-                    console.error(tabs[0].url);
-                    console.error(document.getElementById("domain").value);
-                    console.error(tabs[0].url.includes(document.getElementById("domain").value));
                     if (tabs[0].url.includes(document.getElementById("domain").value)) {
                         chrome.tabs.reload(tabs[0].id);
                     }
