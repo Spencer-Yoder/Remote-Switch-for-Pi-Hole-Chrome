@@ -128,7 +128,7 @@ function whitelist() {
 document.addEventListener("DOMContentLoaded", getPiHoleStatus); //When the page loads get the status
 document.getElementById("sliderBox").addEventListener('change', buttonClicked);    //When the pi-hole toggle is clicked
 document.getElementById("whitelist").addEventListener('click', whitelist);    //When the whitelist button is clicked
+
 chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
-    let url = tabs[0].url;
-    document.getElementById("domain").value = (new URL(url)).hostname;
+    document.getElementById("domain").value = (new URL(tabs[0].url)).hostname; //Set domain text field value to current hostname
 });
