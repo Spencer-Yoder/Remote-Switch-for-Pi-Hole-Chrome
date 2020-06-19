@@ -97,23 +97,25 @@ function getStorage() {
 
 function whitelist() {
     var httpResponse = new XMLHttpRequest();    //Make a new object to accept return from server
-    var url = null;
     var list = "white";
-    var domain = document.getElementById("domain").value;   //get the domain from the box
-    if(domain === "") return;
-    if(document.getElementById("wild").checked) list = "white_wild";
-    console.log(domain + "***");
+    var domain = document.getElementById("domain").value;   //Get the domain from the box
+    if(domain === "") return; //Don't do anything if domain is empty
 
-    //domain = domain * 60;   //get it in minutes
-    url = "http://pi.hole/admin/api.php?list=" + list + "&add="+ encodeURI(domain) + "&auth=" + API_KEY;  //build the url
+    if(document.getElementById("wild").checked) list = "white_wild"; //Set wildcard mode
+
+    var url = "http://pi.hole/admin/api.php?list=" + list + "&add="+ encodeURI(domain) + "&auth=" + API_KEY;  //build the url
+
     httpResponse.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             if(this.response.startsWith("Success")){
+
+                //Get current tab
                 chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                    //Reload tab if tab url contains the whitelisted url
                     if (tabs[0].url.includes(document.getElementById("domain").value)) {
                         chrome.tabs.reload(tabs[0].id);
                     }
-                    document.getElementById("domain").value = "";
+                    document.getElementById("domain").value = ""; //Clear the text field
                 });
             }
         }
@@ -124,8 +126,8 @@ function whitelist() {
 
 
 document.addEventListener("DOMContentLoaded", getPiHoleStatus); //When the page loads get the status
-document.getElementById("sliderBox").addEventListener('change', buttonClicked);    //When the switch is clicked
-document.getElementById("whitelist").addEventListener('click', whitelist);    //When the switch is clicked
+document.getElementById("sliderBox").addEventListener('change', buttonClicked);    //When the pi-hole toggle is clicked
+document.getElementById("whitelist").addEventListener('click', whitelist);    //When the whitelist button is clicked
 chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
     let url = tabs[0].url;
     document.getElementById("domain").value = (new URL(url)).hostname;
